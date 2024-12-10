@@ -167,64 +167,64 @@ Z         = np.zeros( (nrats,nlogps) )
 # TOTAL nr of simulated binaries: n_logps * n_rats * n_universes ( nr of periods * nr of mass ratios * simulations per combination )
 clist = ['#000000','#ffdd00','#ff8800','#ff2200']   # list of colors for the scatter points
 f_detected_list_rat_integrated, f_detected_specific_rat = [], []
-for g in [0]:    # hypothetically this indent could be removed
-    rv_file = rv_files[g]
-    ids = ids_list[g]
-    deltarv_obs = []
-    if whose_data == 's23': rvcol = 'rv'
-    for i,id_i in enumerate(ids):  # indent also not necessary anymore because we stopped running the script for multiple sources
-        if whose_data == 'f03': s = ascii.read( '%s/ab%s.csv'%(fldr,id_i) )# ab for f03; AB for s23
-        if whose_data == 's23': s = ascii.read( '%s/AB%s.csv'%(fldr,id_i) )# ab for f03; AB for s23
-        tobs  = s[tcol]
-        vrads = s[rvcol]
-        vrad_errs = s[rverrcol]
-        print('ID %s'%id_i)
-        delta_rv_tresh = max(vrads) - min(vrads)
-        for x,logp in enumerate(logps_sim):     # get period
-            p_in_d = 10**logp
-            delta_rv_list_rat_integrated = []
-            for y,rat in enumerate(rats_sim):   # get mass ratio
-                delta_rv_list = []
-                for j in range( n_universes):   # for n_universes times, we draw a binary star constellation
-                    binary_notused,p_in_d_notused,rat_notused,poffset, omega, ecc = draw_orbital_conf(1) # we don't use binary because we assume a binary fraction of 1
-                    inc = np.random.choice(incs, p=incprobs)    # draw inclination based on lists that we made
-                    kwr = get_k(p_in_d, rat, inc, ecc)          # get radial velocity amplitude
-                    klist = []
-                    for k in range( len( tobs ) ):              # make a list of radial velocity measurements in the synthetic binary
-                        if set_err_to_zero == False:
-                            rand_err = np.random.normal(0, vrad_errs[k] )
-                        else: rand_err = 0
-                        line_var_err = 0
-                        if sigma_line_var > 0:
-                            line_var_err = np.random.normal( 0,sigma_line_var )
-                        phase = get_phase( tobs[k],p_in_d,poffset )
-                        if ecc == 0:
-                            rv_k  = kwr * np.cos( 2*np.pi*phase )
-                        elif ecc > 0:
-                            rv_k  = get_RV( kwr,omega,0,ecc, phase )   # 0 is gamma, we don't care about v_sys
-                        klist.append( rv_k + rand_err +line_var_err)
-                    delta_rv = max(klist) - min(klist)
-                    delta_rv_list.append(delta_rv)
-                    delta_rv_list_rat_integrated.append(delta_rv)
-                delta_rv_list = np.array(delta_rv_list)
-                delta_rv_u50_list = delta_rv_list[ delta_rv_list < delta_rv_tresh ]
-                f_detected = 1-float(len(delta_rv_u50_list)) / len(delta_rv_list)
-                print('x=%s  y=%s  fraction detected:'%(x,y), np.round( f_detected,2) )
-                Z[y,x] = f_detected
-                color = clist[0]
-                if f_detected < 0.95: color=clist[1] 
-                if f_detected < 0.50: color=clist[2]
-                if f_detected < 0.05: color=clist[3]
-                marker, mas = 'x', 16
-                if whose_data == 'f03': marker,mas = 'o', 10
-                if rat == 0.25 and p_in_d < 365.25:
-                    f_detected_specific_rat.append( f_detected )
-                ax.scatter( logp,rat*20,s=mas,c=color,lw=1.5, marker=marker )
-            delta_rv_list_rat_integrated = np.array( delta_rv_list_rat_integrated )
-            delta_rv_u50_list_rat_integrated = delta_rv_list_rat_integrated[ delta_rv_list_rat_integrated < delta_rv_tresh ]
-            f_detected_rat_integrated = 1-float(len(delta_rv_u50_list_rat_integrated)) / len(delta_rv_list_rat_integrated)
-            f_detected_list_rat_integrated.append( f_detected_rat_integrated )
-            print('		f_detected_list_rat_integrated', f_detected_list_rat_integrated)
+
+rv_file = rv_files[0]
+ids = ids_list[0]
+deltarv_obs = []
+if whose_data == 's23': rvcol = 'rv'
+for i,id_i in enumerate(ids):  # indent also not necessary anymore because we stopped running the script for multiple sources
+    if whose_data == 'f03': s = ascii.read( '%s/ab%s.csv'%(fldr,id_i) )# ab for f03; AB for s23
+    if whose_data == 's23': s = ascii.read( '%s/AB%s.csv'%(fldr,id_i) )# ab for f03; AB for s23
+    tobs  = s[tcol]
+    vrads = s[rvcol]
+    vrad_errs = s[rverrcol]
+	print('ID %s'%id_i)
+    delta_rv_tresh = max(vrads) - min(vrads)
+    for x,logp in enumerate(logps_sim):     # get period
+        p_in_d = 10**logp
+        delta_rv_list_rat_integrated = []
+        for y,rat in enumerate(rats_sim):   # get mass ratio
+            delta_rv_list = []
+            for j in range( n_universes):   # for n_universes times, we draw a binary star constellation
+                binary_notused,p_in_d_notused,rat_notused,poffset, omega, ecc = draw_orbital_conf(1) # we don't use binary because we assume a binary fraction of 1
+                inc = np.random.choice(incs, p=incprobs)    # draw inclination based on lists that we made
+                kwr = get_k(p_in_d, rat, inc, ecc)          # get radial velocity amplitude
+                klist = []
+                for k in range( len( tobs ) ):              # make a list of radial velocity measurements in the synthetic binary
+                    if set_err_to_zero == False:
+                        rand_err = np.random.normal(0, vrad_errs[k] )
+                    else: rand_err = 0
+                    line_var_err = 0
+                    if sigma_line_var > 0:
+                        line_var_err = np.random.normal( 0,sigma_line_var )
+                    phase = get_phase( tobs[k],p_in_d,poffset )
+                    if ecc == 0:
+                        rv_k  = kwr * np.cos( 2*np.pi*phase )
+                    elif ecc > 0:
+                        rv_k  = get_RV( kwr,omega,0,ecc, phase )   # 0 is gamma, we don't care about v_sys
+                    klist.append( rv_k + rand_err +line_var_err)
+                delta_rv = max(klist) - min(klist)
+                delta_rv_list.append(delta_rv)
+                delta_rv_list_rat_integrated.append(delta_rv)
+            delta_rv_list = np.array(delta_rv_list)
+            delta_rv_u50_list = delta_rv_list[ delta_rv_list < delta_rv_tresh ]
+            f_detected = 1-float(len(delta_rv_u50_list)) / len(delta_rv_list)
+            print('x=%s  y=%s  fraction detected:'%(x,y), np.round( f_detected,2) )
+            Z[y,x] = f_detected
+            color = clist[0]
+            if f_detected < 0.95: color=clist[1] 
+            if f_detected < 0.50: color=clist[2]
+            if f_detected < 0.05: color=clist[3]
+            marker, mas = 'x', 16
+            if whose_data == 'f03': marker,mas = 'o', 10
+            if rat == 0.25 and p_in_d < 365.25:
+                f_detected_specific_rat.append( f_detected )
+            ax.scatter( logp,rat*20,s=mas,c=color,lw=1.5, marker=marker )
+        delta_rv_list_rat_integrated = np.array( delta_rv_list_rat_integrated )
+        delta_rv_u50_list_rat_integrated = delta_rv_list_rat_integrated[ delta_rv_list_rat_integrated < delta_rv_tresh ]
+        f_detected_rat_integrated = 1-float(len(delta_rv_u50_list_rat_integrated)) / len(delta_rv_list_rat_integrated)
+        f_detected_list_rat_integrated.append( f_detected_rat_integrated )
+        print('		f_detected_list_rat_integrated', f_detected_list_rat_integrated)
 
 print("	5M and Porb< 1yr:", f_detected_specific_rat )
 print("	average for 5M and Porb< 1yr:", np.average(f_detected_specific_rat) )
